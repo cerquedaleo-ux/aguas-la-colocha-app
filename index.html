@@ -1,0 +1,1867 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aguas La Colocha • Geolocalización Inteligente</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        /* SISTEMA DE DISEÑO PROFESIONAL */
+        :root {
+            --primary: #2A4B8C; /* Azul corporativo profesional */
+            --secondary: #00A86B; /* Verde éxito */
+            --accent: #FF6B35; /* Naranja acción */
+            --gold: #FFD166; /* Dorado premium */
+            --dark: #1A1F36; /* Azul oscuro */
+            --light: #F8FAFC; /* Blanco profesional */
+            --success: #00C9A7; /* Turquesa éxito */
+            --warning: #FF9E00; /* Ámbar alerta */
+            --radius-1: rgba(42, 75, 140, 0.15);
+            --radius-2: rgba(0, 168, 107, 0.15);
+            --radius-3: rgba(255, 107, 53, 0.15);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1A1F36, #2A4B8C);
+            min-height: 100vh;
+            padding: 20px;
+            font-weight: 400;
+        }
+        
+        /* CONTENEDOR PRINCIPAL CON SOMBRA PROFESIONAL */
+        .app-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 
+                0 20px 60px rgba(26, 31, 54, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        
+        /* HEADER PROFESIONAL CON GRADIENTE */
+        .header {
+            background: linear-gradient(135deg, var(--primary), #1A3B7A);
+            color: white;
+            padding: 30px 25px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 214, 102, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 168, 107, 0.1) 0%, transparent 50%);
+        }
+        
+        /* LOGOTIPO PROFESIONAL */
+        .logo-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo-badge {
+            background: linear-gradient(135deg, var(--gold), #FFC043);
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 10px 30px rgba(255, 209, 102, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .logo-badge i {
+            font-size: 32px;
+            color: white;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+        
+        .brand-text {
+            flex: 1;
+        }
+        
+        .brand-text h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, white, var(--gold));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .brand-text .tagline {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+        
+        /* PUNTUACIÓN DE EFECTIVIDAD */
+        .effectiveness-score {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 15px 25px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--gold);
+            line-height: 1;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .score-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+        
+        /* PANEL DE GEOLOCALIZACIÓN PREMIUM */
+        .geo-dashboard {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .geo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .geo-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            background: var(--success);
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .status-indicator.active {
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 0 4px rgba(0, 201, 167, 0.3);
+        }
+        
+        .geo-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 25px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+        
+        /* MAPA CON DISEÑO PREMIUM */
+        .map-section {
+            position: relative;
+            height: 450px;
+            background: var(--dark);
+            border-bottom: 5px solid var(--primary);
+        }
+        
+        #map {
+            height: 100%;
+            width: 100%;
+            filter: saturate(1.1) contrast(1.05);
+        }
+        
+        /* CONTROLES DE MAPA FLOTANTES */
+        .map-controls {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .control-btn {
+            width: 56px;
+            height: 56px;
+            background: white;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: var(--primary);
+            cursor: pointer;
+            box-shadow: 
+                0 8px 25px rgba(26, 31, 54, 0.2),
+                0 1px 3px rgba(0, 0, 0, 0.1);
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .control-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 
+                0 12px 30px rgba(26, 31, 54, 0.3),
+                0 3px 8px rgba(0, 0, 0, 0.15);
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* PANEL DE RADIOS DE ACCIÓN */
+        .radius-panel {
+            position: absolute;
+            bottom: 25px;
+            left: 25px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 
+                0 20px 60px rgba(26, 31, 54, 0.25),
+                0 0 0 1px rgba(0, 0, 0, 0.05);
+            max-width: 320px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .radius-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .radius-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .radius-option {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .radius-option:hover {
+            background: rgba(42, 75, 140, 0.05);
+            transform: translateX(5px);
+        }
+        
+        .radius-option.active {
+            background: rgba(42, 75, 140, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .radius-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+        
+        /* CONTENIDO PRINCIPAL */
+        .content {
+            padding: 35px 30px;
+            background: var(--light);
+        }
+        
+        /* SECCIÓN DE OFERTAS PROFESIONALES */
+        .offers-section {
+            margin-bottom: 40px;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .section-title i {
+            color: var(--primary);
+        }
+        
+        .offer-filters {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 2px solid #E2E8F0;
+            background: white;
+            color: var(--dark);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        /* OFERTAS EN GRID */
+        .offers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .offer-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 
+                0 8px 30px rgba(26, 31, 54, 0.08),
+                0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+        
+        .offer-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 
+                0 20px 50px rgba(26, 31, 54, 0.15),
+                0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .offer-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--accent);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            z-index: 2;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+        
+        .offer-header {
+            padding: 30px 30px 20px;
+            position: relative;
+        }
+        
+        .offer-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .offer-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        
+        .offer-description {
+            color: #64748B;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .offer-details {
+            padding: 0 30px 25px;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            color: #475569;
+            font-size: 0.9rem;
+        }
+        
+        .detail-item i {
+            color: var(--primary);
+            width: 20px;
+        }
+        
+        .offer-actions {
+            padding: 0 30px 30px;
+        }
+        
+        .offer-btn {
+            width: 100%;
+            padding: 18px;
+            border-radius: 16px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .offer-btn.primary {
+            background: linear-gradient(135deg, var(--primary), #1A3B7A);
+            color: white;
+            box-shadow: 0 8px 25px rgba(42, 75, 140, 0.3);
+        }
+        
+        .offer-btn.primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(42, 75, 140, 0.4);
+        }
+        
+        .offer-btn.secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid #E2E8F0;
+        }
+        
+        .offer-btn.secondary:hover {
+            background: rgba(42, 75, 140, 0.05);
+            border-color: var(--primary);
+        }
+        
+        /* SECCIÓN DE CLIENTES CERCANOS */
+        .clients-section {
+            background: white;
+            border-radius: 28px;
+            padding: 35px;
+            margin-bottom: 40px;
+            box-shadow: 
+                0 10px 40px rgba(26, 31, 54, 0.08),
+                0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+        
+        .client-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 25px;
+            background: var(--light);
+            border-radius: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .client-card:hover {
+            border-color: var(--primary);
+            background: white;
+            transform: translateX(5px);
+        }
+        
+        .client-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .client-info {
+            flex: 1;
+        }
+        
+        .client-name {
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+        
+        .client-details {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        
+        .client-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #64748B;
+        }
+        
+        .client-distance {
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 14px;
+            font-weight: 700;
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        /* PANEL DE NOTIFICACIONES PREMIUM */
+        .notification-panel {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 9999;
+            max-width: 380px;
+            width: 100%;
+        }
+        
+        .notification {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 
+                0 20px 60px rgba(26, 31, 54, 0.25),
+                0 0 0 1px rgba(0, 0, 0, 0.05);
+            animation: slideInRight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            border-left: 6px solid;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .notification::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+        
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .notification-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .notification-title {
+            font-weight: 800;
+            color: var(--dark);
+            font-size: 1.2rem;
+            flex: 1;
+        }
+        
+        .notification-time {
+            font-size: 0.85rem;
+            color: #94A3B8;
+            font-weight: 500;
+        }
+        
+        .notification-body {
+            color: #475569;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .notification-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        /* FOOTER PROFESIONAL */
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 40px 30px;
+            border-top: 5px solid var(--primary);
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .footer-section h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--gold);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-link {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .social-link:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        
+        /* ANIMACIONES PROFESIONALES */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 201, 167, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 201, 167, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 201, 167, 0); }
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate {
+            animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .app-container {
+                border-radius: 20px;
+            }
+            
+            .logo-section {
+                flex-direction: column;
+                gap: 20px;
+                align-items: flex-start;
+            }
+            
+            .geo-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .offers-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .radius-panel {
+                max-width: calc(100% - 50px);
+            }
+            
+            .map-controls {
+                top: 15px;
+                right: 15px;
+            }
+            
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* UTILIDADES */
+        .gradient-primary {
+            background: linear-gradient(135deg, var(--primary), #1A3B7A);
+        }
+        
+        .gradient-success {
+            background: linear-gradient(135deg, var(--success), #00A86B);
+        }
+        
+        .gradient-warning {
+            background: linear-gradient(135deg, var(--warning), #FF7E1F);
+        }
+        
+        .gradient-accent {
+            background: linear-gradient(135deg, var(--accent), #FF8B4A);
+        }
+        
+        .gradient-gold {
+            background: linear-gradient(135deg, var(--gold), #FFB545);
+        }
+        
+        .shadow-lg {
+            box-shadow: 0 10px 40px rgba(26, 31, 54, 0.15);
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- PANEL DE NOTIFICACIONES -->
+    <div class="notification-panel" id="notificationPanel"></div>
+    
+    <!-- APLICACIÓN PRINCIPAL -->
+    <div class="app-container">
+        <!-- HEADER PREMIUM -->
+        <div class="header">
+            <div class="logo-section">
+                <div class="brand-container">
+                    <div class="logo-badge gradient-gold">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <div class="brand-text">
+                        <h1>LA COLOCHA</h1>
+                        <div class="tagline">Sistema Inteligente de Geolocalización Comercial</div>
+                    </div>
+                </div>
+                <div class="effectiveness-score glass-effect">
+                    <div class="score-value">94%</div>
+                    <div class="score-label">Efectividad</div>
+                </div>
+            </div>
+            
+            <!-- PANEL DE GEOLOCALIZACIÓN -->
+            <div class="geo-dashboard">
+                <div class="geo-header">
+                    <div class="geo-status">
+                        <div class="status-indicator active"></div>
+                        <div style="color: white; font-weight: 600;">Geolocalización Activa</div>
+                    </div>
+                    <div style="color: rgba(255,255,255,0.9); font-size: 0.95rem;">
+                        <i class="fas fa-sync-alt fa-spin"></i> Actualizando en tiempo real
+                    </div>
+                </div>
+                
+                <div class="geo-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statRadius">1.5km</div>
+                        <div class="stat-label">Radio Activo</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statClients">8</div>
+                        <div class="stat-label">Clientes en Zona</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statOpportunities">12</div>
+                        <div class="stat-label">Oportunidades</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MAPA INTERACTIVO -->
+        <div class="map-section">
+            <div id="map"></div>
+            
+            <!-- CONTROLES FLOTANTES -->
+            <div class="map-controls">
+                <button class="control-btn" onclick="centerOnUser()" title="Centrar en mi ubicación">
+                    <i class="fas fa-crosshairs"></i>
+                </button>
+                <button class="control-btn" onclick="toggleLayer('schools')" title="Escuelas">
+                    <i class="fas fa-school"></i>
+                </button>
+                <button class="control-btn" onclick="toggleLayer('businesses')" title="Negocios">
+                    <i class="fas fa-store"></i>
+                </button>
+                <button class="control-btn" onclick="scanHotspots()" title="Puntos calientes">
+                    <i class="fas fa-fire"></i>
+                </button>
+            </div>
+            
+            <!-- PANEL DE RADIOS -->
+            <div class="radius-panel">
+                <div class="radius-title">
+                    <i class="fas fa-satellite-dish"></i>
+                    Radios de Acción Comercial
+                </div>
+                <div class="radius-options">
+                    <div class="radius-option active" onclick="setRadius(500)">
+                        <div class="radius-color" style="background: var(--radius-1);"></div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--dark);">Zona Inmediata</div>
+                            <div style="font-size: 0.9rem; color: #64748B;">500m • Ofertas flash</div>
+                        </div>
+                    </div>
+                    <div class="radius-option" onclick="setRadius(1000)">
+                        <div class="radius-color" style="background: var(--radius-2);"></div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--dark);">Zona Cercana</div>
+                            <div style="font-size: 0.9rem; color: #64748B;">1km • Promociones estratégicas</div>
+                        </div>
+                    </div>
+                    <div class="radius-option" onclick="setRadius(2000)">
+                        <div class="radius-color" style="background: var(--radius-3);"></div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--dark);">Zona Extendida</div>
+                            <div style="font-size: 0.9rem; color: #64748B;">2km • Campañas preventivas</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="content">
+            <!-- OFERTAS ESTRATÉGICAS -->
+            <div class="offers-section">
+                <div class="section-header">
+                    <div class="section-title">
+                        <i class="fas fa-bullseye"></i>
+                        Ofertas Inteligentes por Proximidad
+                    </div>
+                    <div class="offer-filters">
+                        <button class="filter-btn active" onclick="filterOffers('all')">Todas</button>
+                        <button class="filter-btn" onclick="filterOffers('immediate')">Inmediatas</button>
+                        <button class="filter-btn" onclick="filterOffers('strategic')">Estratégicas</button>
+                    </div>
+                </div>
+                
+                <div class="offers-grid" id="offersGrid">
+                    <!-- Las ofertas se cargan dinámicamente -->
+                </div>
+            </div>
+            
+            <!-- CLIENTES DETECTADOS -->
+            <div class="clients-section">
+                <div class="section-title" style="margin-bottom: 25px;">
+                    <i class="fas fa-users"></i>
+                    Clientes Detectados en tu Zona
+                </div>
+                <div id="clientsList">
+                    <!-- Los clientes se cargan dinámicamente -->
+                </div>
+            </div>
+            
+            <!-- PANEL DE ACCIONES RÁPIDAS -->
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 40px;">
+                <button class="offer-btn primary" onclick="launchCampaign()">
+                    <i class="fas fa-rocket"></i>
+                    LANZAR CAMPAÑA EN ZONA
+                </button>
+                <button class="offer-btn secondary" onclick="generateReport()">
+                    <i class="fas fa-chart-bar"></i>
+                    INFORME DE EFECTIVIDAD
+                </button>
+            </div>
+        </div>
+        
+        <!-- FOOTER PROFESIONAL -->
+        <div class="footer">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>La Colocha</h3>
+                    <p style="color: rgba(255,255,255,0.8); line-height: 1.6; margin-bottom: 20px;">
+                        Sistema de geolocalización inteligente para distribución estratégica de aguas refrescantes.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" onclick="openWhatsApp()">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="#" class="social-link" onclick="openFacebook()">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="social-link" onclick="openInstagram()">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contacto</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-phone" style="margin-right: 10px;"></i> 961 860 4446</li>
+                        <li><i class="fas fa-map-marker-alt" style="margin-right: 10px;"></i> 12a Norte Oriente No. 430</li>
+                        <li><i class="fas fa-city" style="margin-right: 10px;"></i> Tuxtla Gutiérrez, Chiapas</li>
+                        <li><i class="fas fa-clock" style="margin-right: 10px;"></i> L-V: 8:00 AM - 6:00 PM</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Recursos</h3>
+                    <ul class="footer-links">
+                        <li><a href="#" onclick="showManual()">Manual de uso</a></li>
+                        <li><a href="#" onclick="showTraining()">Video capacitación</a></li>
+                        <li><a href="#" onclick="downloadReports()">Reportes descargables</a></li>
+                        <li><a href="#" onclick="contactSupport()">Soporte técnico</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                © 2024 Aguas La Colocha. Sistema de Geolocalización Comercial Inteligente.<br>
+                Todos los derechos reservados. v3.1.0
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // ============================================
+        // SISTEMA PROFESIONAL DE OFERTAS ESTRATÉGICAS
+        // ============================================
+        const STRATEGIC_OFFERS = [
+            {
+                id: 'offer-1',
+                title: 'PAQUETE ESCUELA PREMIUM',
+                description: 'Oferta exclusiva para instituciones educativas con descuento por volumen y entrega prioritaria.',
+                icon: 'fas fa-graduation-cap',
+                iconColor: '#2A4B8C',
+                badge: 'MÁS VENDIDO',
+                details: [
+                    { icon: 'fas fa-percentage', text: '20% de descuento en pedidos >100 unidades' },
+                    { icon: 'fas fa-truck-fast', text: 'Entrega en 24 horas garantizada' },
+                    { icon: 'fas fa-calendar-check', text: 'Programación mensual automática' },
+                    { icon: 'fas fa-chart-line', text: 'Reporte de consumo mensual incluido' }
+                ],
+                conditions: 'Aplica para escuelas públicas y privadas',
+                distance: 500,
+                type: 'immediate',
+                actionText: 'ENVIAR OFERTA ESCUELA',
+                color: 'primary'
+            },
+            {
+                id: 'offer-2',
+                title: 'COMBO FOOD TRUCK ÉLITE',
+                description: 'Programa de abastecimiento continuo para food trucks con precios preferenciales y rotación garantizada.',
+                icon: 'fas fa-truck',
+                iconColor: '#FF6B35',
+                badge: 'EXCLUSIVO',
+                details: [
+                    { icon: 'fas fa-boxes', text: 'Rotación garantizada de inventario' },
+                    { icon: 'fas fa-bolt', text: 'Reabastecimiento express en 2 horas' },
+                    { icon: 'fas fa-tags', text: 'Precios especiales por contrato anual' },
+                    { icon: 'fas fa-shield-alt', text: 'Garantía de frescura extendida' }
+                ],
+                conditions: 'Mínimo 3 food trucks en asociación',
+                distance: 300,
+                type: 'immediate',
+                actionText: 'PROPONER ASOCIACIÓN',
+                color: 'accent'
+            },
+            {
+                id: 'offer-3',
+                title: 'PROGRAMA OFICINAS CORPORATIVAS',
+                description: 'Solución de hidratación empresarial con dispensadores inteligentes y servicio de mantenimiento incluido.',
+                icon: 'fas fa-building',
+                iconColor: '#00A86B',
+                badge: 'CORPORATIVO',
+                details: [
+                    { icon: 'fas fa-tint', text: 'Dispensadores de agua con sistema purificador' },
+                    { icon: 'fas fa-user-cog', text: 'Servicio técnico especializado 24/7' },
+                    { icon: 'fas fa-chart-pie', text: 'Dashboard de consumo en tiempo real' },
+                    { icon: 'fas fa-recycle', text: 'Programa de reciclaje de envases' }
+                ],
+                conditions: 'Mínimo 50 empleados',
+                distance: 1000,
+                type: 'strategic',
+                actionText: 'SOLICITAR COTIZACIÓN',
+                color: 'success'
+            },
+            {
+                id: 'offer-4',
+                title: 'EVENTOS MASIVOS ESPECIAL',
+                description: 'Paquete completo para eventos deportivos, ferias y convenciones con logística especializada.',
+                icon: 'fas fa-calendar-star',
+                iconColor: '#FFD166',
+                badge: 'TEMPORAL',
+                details: [
+                    { icon: 'fas fa-users', text: 'Cálculo automático por asistencia esperada' },
+                    { icon: 'fas fa-route', text: 'Logística de entrega en sitio del evento' },
+                    { icon: 'fas fa-ice-cream', text: 'Puntos de hidratación con personal' },
+                    { icon: 'fas fa-handshake', text: 'Contratos flexibles por evento' }
+                ],
+                conditions: 'Reserva mínima con 72 horas de anticipación',
+                distance: 1500,
+                type: 'strategic',
+                actionText: 'PLANIFICAR EVENTO',
+                color: 'warning'
+            },
+            {
+                id: 'offer-5',
+                title: 'ALIANZA RESTAURANTERA',
+                description: 'Programa de proveeduría exclusiva para restaurantes con menú de aguas gourmet personalizadas.',
+                icon: 'fas fa-utensils',
+                iconColor: '#9B26B6',
+                badge: 'GOURMET',
+                details: [
+                    { icon: 'fas fa-cocktail', text: 'Recetas exclusivas para cada restaurante' },
+                    { icon: 'fas fa-wine-bottle', text: 'Envases premium con branding personalizado' },
+                    { icon: 'fas fa-clock', text: 'Entregas programadas según horario pico' },
+                    { icon: 'fas fa-star', text: 'Capacitación para staff de servicio' }
+                ],
+                conditions: 'Restaurantes con mínimo 2 años de operación',
+                distance: 800,
+                type: 'strategic',
+                actionText: 'CREAR ALIANZA',
+                color: 'secondary'
+            },
+            {
+                id: 'offer-6',
+                title: 'CAMPAMENTOS Y CENTROS DEPORTIVOS',
+                description: 'Solución integral de hidratación para actividades físicas intensas con énfasis en recuperación.',
+                icon: 'fas fa-running',
+                iconColor: '#00C9A7',
+                badge: 'DEPORTIVO',
+                details: [
+                    { icon: 'fas fa-heartbeat', text: 'Fórmulas especiales con electrolitos' },
+                    { icon: 'fas fa-temperature-low', text: 'Cadena de frío garantizada' },
+                    { icon: 'fas fa-dumbbell', text: 'Puntos de hidratación estratégicos' },
+                    { icon: 'fas fa-user-md', text: 'Asesoría nutricional incluida' }
+                ],
+                conditions: 'Centros con mínimo 100 atletas',
+                distance: 1200,
+                type: 'strategic',
+                actionText: 'IMPLEMENTAR PROGRAMA',
+                color: 'success'
+            }
+        ];
+
+        // ============================================
+        // SISTEMA DE CLIENTES PREMIUM
+        // ============================================
+        const PREMIUM_CLIENTS = [
+            {
+                id: 'client-1',
+                name: 'Colegio La Salle Tuxtla',
+                type: 'school',
+                avatarColor: '#2A4B8C',
+                avatarIcon: 'fas fa-school',
+                details: [
+                    { icon: 'fas fa-users', text: '1,250 alumnos' },
+                    { icon: 'fas fa-history', text: 'Cliente desde 2022' },
+                    { icon: 'fas fa-shopping-cart', text: '300L/mes promedio' }
+                ],
+                distance: 450,
+                status: 'active',
+                potential: 'alto'
+            },
+            {
+                id: 'client-2',
+                name: 'Food Park Central',
+                type: 'foodtruck',
+                avatarColor: '#FF6B35',
+                avatarIcon: 'fas fa-hamburger',
+                details: [
+                    { icon: 'fas fa-store', text: '8 food trucks asociados' },
+                    { icon: 'fas fa-clock', text: 'Abierto 7 días' },
+                    { icon: 'fas fa-chart-line', text: '500+ clientes/día' }
+                ],
+                distance: 320,
+                status: 'prospect',
+                potential: 'muy alto'
+            },
+            {
+                id: 'client-3',
+                name: 'Gobierno del Estado',
+                type: 'government',
+                avatarColor: '#00A86B',
+                avatarIcon: 'fas fa-landmark',
+                details: [
+                    { icon: 'fas fa-building', text: '15 edificios públicos' },
+                    { icon: 'fas fa-user-tie', text: '2,000 funcionarios' },
+                    { icon: 'fas fa-file-contract', text: 'Contrato anual' }
+                ],
+                distance: 1200,
+                status: 'negotiation',
+                potential: 'estrategico'
+            },
+            {
+                id: 'client-4',
+                name: 'Hotel Camino Real',
+                type: 'hotel',
+                avatarColor: '#FFD166',
+                avatarIcon: 'fas fa-hotel',
+                details: [
+                    { icon: 'fas fa-bed', text: '120 habitaciones' },
+                    { icon: 'fas fa-concierge-bell', text: 'Servicio a cuartos' },
+                    { icon: 'fas fa-swimming-pool', text: 'Área de alberca' }
+                ],
+                distance: 850,
+                status: 'active',
+                potential: 'medio'
+            },
+            {
+                id: 'client-5',
+                name: 'Plaza Comercial Las Torres',
+                type: 'mall',
+                avatarColor: '#9B26B6',
+                avatarIcon: 'fas fa-shopping-cart',
+                details: [
+                    { icon: 'fas fa-store', text: '50 locales comerciales' },
+                    { icon: 'fas fa-walking', text: '5,000 visitas/día' },
+                    { icon: 'fas fa-utensils', text: 'Zona de alimentos' }
+                ],
+                distance: 1100,
+                status: 'prospect',
+                potential: 'alto'
+            }
+        ];
+
+        // ============================================
+        // CONFIGURACIÓN DEL SISTEMA
+        // ============================================
+        const SYSTEM_CONFIG = {
+            activeRadius: 1000,
+            updateInterval: 10000,
+            notificationDuration: 8000,
+            effectivenessScore: 94
+        };
+
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        let map;
+        let userMarker;
+        let geofenceCircle;
+        let watchId;
+        let userLocation = {
+            lat: 16.7538,
+            lng: -93.1145,
+            accuracy: 50
+        };
+
+        // ============================================
+        // INICIALIZACIÓN DEL SISTEMA
+        // ============================================
+        function initSystem() {
+            initMap();
+            loadStrategicOffers();
+            loadPremiumClients();
+            startGeolocationMonitoring();
+            updateDashboardStats();
+            
+            // Mostrar notificación de bienvenida
+            setTimeout(() => {
+                showProfessionalNotification(
+                    'Sistema Inicializado',
+                    'Geolocalización comercial activa. Monitoreando oportunidades en tiempo real.',
+                    'fas fa-satellite',
+                    '#2A4B8C'
+                );
+            }, 1500);
+        }
+
+        // ============================================
+        // MAPA INTERACTIVO PROFESIONAL
+        // ============================================
+        function initMap() {
+            map = L.map('map').setView([userLocation.lat, userLocation.lng], 14);
+            
+            // Capa de mapa profesional
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '© CARTO',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+            
+            // Marcador del usuario
+            userMarker = L.marker([userLocation.lat, userLocation.lng], {
+                icon: L.divIcon({
+                    html: `
+                        <div style="
+                            background: linear-gradient(135deg, #2A4B8C, #1A3B7A);
+                            width: 60px;
+                            height: 60px;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            border: 3px solid white;
+                            box-shadow: 0 10px 30px rgba(42, 75, 140, 0.4);
+                            position: relative;
+                        ">
+                            <i class="fas fa-crosshairs" style="color: white; font-size: 1.5rem;"></i>
+                            <div style="
+                                position: absolute;
+                                top: -5px;
+                                right: -5px;
+                                width: 20px;
+                                height: 20px;
+                                background: #00C9A7;
+                                border-radius: 50%;
+                                border: 2px solid white;
+                                animation: pulse 2s infinite;
+                            "></div>
+                        </div>
+                    `,
+                    className: 'user-marker',
+                    iconSize: [60, 60],
+                    iconAnchor: [30, 60]
+                })
+            }).addTo(map).bindPopup(`
+                <div style="padding: 10px;">
+                    <strong>📍 Tu Posición Actual</strong><br>
+                    <small>Sistema activo de geolocalización comercial</small>
+                </div>
+            `);
+            
+            // Círculo de geofencing
+            geofenceCircle = L.circle([userLocation.lat, userLocation.lng], {
+                color: '#2A4B8C',
+                fillColor: '#2A4B8C',
+                fillOpacity: 0.1,
+                radius: SYSTEM_CONFIG.activeRadius,
+                weight: 2,
+                dashArray: '5, 5'
+            }).addTo(map);
+            
+            // Agregar puntos de interés
+            addPointsOfInterest();
+        }
+
+        // ============================================
+        // SISTEMA DE GEOLOCALIZACIÓN
+        // ============================================
+        function startGeolocationMonitoring() {
+            if (navigator.geolocation) {
+                watchId = navigator.geolocation.watchPosition(
+                    handleLocationUpdate,
+                    handleLocationError,
+                    {
+                        enableHighAccuracy: true,
+                        maximumAge: 10000,
+                        timeout: 15000
+                    }
+                );
+                
+                document.getElementById('statRadius').textContent = (SYSTEM_CONFIG.activeRadius / 1000) + 'km';
+            }
+        }
+
+        function handleLocationUpdate(position) {
+            const newLat = position.coords.latitude;
+            const newLng = position.coords.longitude;
+            const accuracy = position.coords.accuracy;
+            
+            // Actualizar ubicación
+            userLocation = { lat: newLat, lng: newLng, accuracy };
+            
+            // Actualizar marcador
+            userMarker.setLatLng([newLat, newLng]);
+            geofenceCircle.setLatLng([newLat, newLng]);
+            
+            // Detectar oportunidades cercanas
+            detectNearbyOpportunities();
+            
+            // Actualizar estadísticas
+            updateDashboardStats();
+        }
+
+        function handleLocationError(error) {
+            console.error('Error de geolocalización:', error);
+        }
+
+        // ============================================
+        // SISTEMA DE OFERTAS ESTRATÉGICAS
+        // ============================================
+        function loadStrategicOffers() {
+            const container = document.getElementById('offersGrid');
+            container.innerHTML = '';
+            
+            STRATEGIC_OFFERS.forEach(offer => {
+                const card = document.createElement('div');
+                card.className = 'offer-card animate';
+                card.style.animationDelay = `${STRATEGIC_OFFERS.indexOf(offer) * 0.1}s`;
+                
+                card.innerHTML = `
+                    <div class="offer-badge" style="background: ${offer.iconColor};">${offer.badge}</div>
+                    <div class="offer-header">
+                        <div class="offer-icon" style="background: ${offer.iconColor}; color: white;">
+                            <i class="${offer.icon}"></i>
+                        </div>
+                        <h3 class="offer-title">${offer.title}</h3>
+                        <p class="offer-description">${offer.description}</p>
+                    </div>
+                    <div class="offer-details">
+                        ${offer.details.map(detail => `
+                            <div class="detail-item">
+                                <i class="${detail.icon}"></i>
+                                <span>${detail.text}</span>
+                            </div>
+                        `).join('')}
+                        <div class="detail-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>Activa en ${offer.distance}m • ${offer.conditions}</span>
+                        </div>
+                    </div>
+                    <div class="offer-actions">
+                        <button class="offer-btn ${offer.color}" onclick="launchOffer('${offer.id}')">
+                            <i class="fas fa-paper-plane"></i>
+                            ${offer.actionText}
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        function filterOffers(type) {
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const container = document.getElementById('offersGrid');
+            const filteredOffers = type === 'all' 
+                ? STRATEGIC_OFFERS 
+                : STRATEGIC_OFFERS.filter(offer => offer.type === type);
+            
+            container.innerHTML = '';
+            filteredOffers.forEach(offer => {
+                const card = document.createElement('div');
+                card.className = 'offer-card';
+                card.innerHTML = `
+                    <div class="offer-badge" style="background: ${offer.iconColor};">${offer.badge}</div>
+                    <div class="offer-header">
+                        <div class="offer-icon" style="background: ${offer.iconColor}; color: white;">
+                            <i class="${offer.icon}"></i>
+                        </div>
+                        <h3 class="offer-title">${offer.title}</h3>
+                        <p class="offer-description">${offer.description}</p>
+                    </div>
+                    <div class="offer-details">
+                        ${offer.details.map(detail => `
+                            <div class="detail-item">
+                                <i class="${detail.icon}"></i>
+                                <span>${detail.text}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="offer-actions">
+                        <button class="offer-btn ${offer.color}" onclick="launchOffer('${offer.id}')">
+                            <i class="fas fa-paper-plane"></i>
+                            ${offer.actionText}
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // ============================================
+        // SISTEMA DE CLIENTES PREMIUM
+        // ============================================
+        function loadPremiumClients() {
+            const container = document.getElementById('clientsList');
+            container.innerHTML = '';
+            
+            PREMIUM_CLIENTS.forEach(client => {
+                const card = document.createElement('div');
+                card.className = 'client-card animate';
+                card.style.animationDelay = `${PREMIUM_CLIENTS.indexOf(client) * 0.1}s`;
+                
+                card.innerHTML = `
+                    <div class="client-avatar" style="background: ${client.avatarColor};">
+                        <i class="${client.avatarIcon}"></i>
+                    </div>
+                    <div class="client-info">
+                        <div class="client-name">${client.name}</div>
+                        <div style="display: flex; gap: 10px; margin-top: 5px;">
+                            <span style="
+                                background: ${getStatusColor(client.status)};
+                                color: white;
+                                padding: 4px 12px;
+                                border-radius: 20px;
+                                font-size: 0.8rem;
+                                font-weight: 600;
+                            ">
+                                ${client.status.toUpperCase()}
+                            </span>
+                            <span style="
+                                background: ${getPotentialColor(client.potential)};
+                                color: white;
+                                padding: 4px 12px;
+                                border-radius: 20px;
+                                font-size: 0.8rem;
+                                font-weight: 600;
+                            ">
+                                ${client.potential.toUpperCase()}
+                            </span>
+                        </div>
+                        <div class="client-details">
+                            ${client.details.map(detail => `
+                                <div class="client-detail">
+                                    <i class="${detail.icon}"></i>
+                                    <span>${detail.text}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="client-distance">
+                        ${client.distance}m
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // ============================================
+        // FUNCIONALIDADES PRINCIPALES
+        // ============================================
+        function setRadius(meters) {
+            SYSTEM_CONFIG.activeRadius = meters;
+            geofenceCircle.setRadius(meters);
+            document.getElementById('statRadius').textContent = (meters / 1000) + 'km';
+            
+            // Actualizar opciones activas
+            document.querySelectorAll('.radius-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            event.target.closest('.radius-option').classList.add('active');
+            
+            // Mostrar notificación
+            showProfessionalNotification(
+                'Radio Actualizado',
+                `Zona de acción comercial configurada a ${meters} metros`,
+                'fas fa-expand-alt',
+                '#2A4B8C'
+            );
+        }
+
+        function centerOnUser() {
+            map.setView([userLocation.lat, userLocation.lng], 15);
+        }
+
+        function toggleLayer(layer) {
+            // Implementar lógica de capas
+            showProfessionalNotification(
+                'Capa Actualizada',
+                `Visualización de ${layer} modificada`,
+                'fas fa-layer-group',
+                '#00A86B'
+            );
+        }
+
+        function scanHotspots() {
+            showProfessionalNotification(
+                'Escaneo en Proceso',
+                'Analizando puntos calientes de oportunidad comercial...',
+                'fas fa-search-location',
+                '#FF6B35'
+            );
+            
+            // Simular detección
+            setTimeout(() => {
+                const opportunities = Math.floor(Math.random() * 5) + 8;
+                document.getElementById('statOpportunities').textContent = opportunities;
+                
+                showProfessionalNotification(
+                    '¡Puntos Calientes Detectados!',
+                    `Se encontraron ${opportunities} oportunidades comerciales en tu zona`,
+                    'fas fa-fire',
+                    '#FF6B35',
+                    true
+                );
+            }, 2000);
+        }
+
+        function launchOffer(offerId) {
+            const offer = STRATEGIC_OFFERS.find(o => o.id === offerId);
+            if (!offer) return;
+            
+            showProfessionalNotification(
+                'Oferta en Proceso',
+                `Preparando ${offer.title} para envío...`,
+                'fas fa-paper-plane',
+                offer.iconColor
+            );
+            
+            // Simular envío
+            setTimeout(() => {
+                showProfessionalNotification(
+                    '¡Oferta Enviada!',
+                    `${offer.title} ha sido distribuida a clientes en tu zona`,
+                    'fas fa-check-circle',
+                    '#00A86B',
+                    true
+                );
+                
+                // Actualizar efectividad
+                SYSTEM_CONFIG.effectivenessScore = Math.min(100, SYSTEM_CONFIG.effectivenessScore + 1);
+                document.querySelector('.score-value').textContent = SYSTEM_CONFIG.effectivenessScore + '%';
+            }, 1500);
+        }
+
+        function launchCampaign() {
+            showProfessionalNotification(
+                '🚀 Campaña Comercial',
+                'Iniciando campaña de marketing geolocalizado...',
+                'fas fa-bullhorn',
+                '#FF6B35'
+            );
+            
+            // Simular campaña
+            setTimeout(() => {
+                showProfessionalNotification(
+                    'Campaña Activa',
+                    'Tu campaña comercial está siendo distribuida en toda la zona',
+                    'fas fa-chart-line',
+                    '#00A86B',
+                    true
+                );
+                
+                // Actualizar estadísticas
+                const newClients = Math.floor(Math.random() * 3) + 2;
+                const currentClients = parseInt(document.getElementById('statClients').textContent);
+                document.getElementById('statClients').textContent = currentClients + newClients;
+            }, 2000);
+        }
+
+        function generateReport() {
+            showProfessionalNotification(
+                '📊 Generando Informe',
+                'Compilando datos de efectividad y oportunidades...',
+                'fas fa-file-chart-line',
+                '#2A4B8C'
+            );
+            
+            setTimeout(() => {
+                const reportData = {
+                    efectividad: SYSTEM_CONFIG.effectivenessScore + '%',
+                    clientesZona: document.getElementById('statClients').textContent,
+                    oportunidades: document.getElementById('statOpportunities').textContent,
+                    radioActivo: document.getElementById('statRadius').textContent,
+                    fecha: new Date().toLocaleDateString()
+                };
+                
+                const reportMessage = `
+                    📈 INFORME DE EFECTIVIDAD COMERCIAL
+                    
+                    Efectividad del sistema: ${reportData.efectividad}
+                    Clientes en zona activa: ${reportData.clientesZona}
+                    Oportunidades detectadas: ${reportData.oportunidades}
+                    Radio de acción: ${reportData.radioActivo}
+                    Fecha del informe: ${reportData.fecha}
+                    
+                    Recomendación: Mantener campañas activas en zona de alto tráfico.
+                `;
+                
+                alert(reportMessage);
+            }, 1500);
+        }
+
+        // ============================================
+        // SISTEMA DE NOTIFICACIONES PROFESIONALES
+        // ============================================
+        function showProfessionalNotification(title, message, icon, color, important = false) {
+            const panel = document.getElementById('notificationPanel');
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.style.borderLeftColor = color;
+            
+            if (important) {
+                notification.style.animation = 'slideInRight 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                notification.style.boxShadow = '0 20px 60px rgba(26, 31, 54, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.05), 0 0 0 3px ' + color;
+            }
+            
+            notification.innerHTML = `
+                <div class="notification-header">
+                    <div class="notification-icon" style="background: ${color};">
+                        <i class="${icon}"></i>
+                    </div>
+                    <div>
+                        <div class="notification-title">${title}</div>
+                        <div class="notification-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                    </div>
+                </div>
+                <div class="notification-body">
+                    ${message}
+                </div>
+                ${important ? `
+                <div class="notification-actions">
+                    <button style="
+                        background: ${color};
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 12px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        flex: 1;
+                    " onclick="this.parentElement.parentElement.remove()">
+                        <i class="fas fa-check"></i> Entendido
+                    </button>
+                </div>
+                ` : ''}
+            `;
+            
+            panel.appendChild(notification);
+            
+            // Auto-eliminar después de un tiempo
+            if (!important) {
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.style.opacity = '0';
+                        notification.style.transform = 'translateX(100%)';
+                        setTimeout(() => {
+                            if (notification.parentNode) {
+                                notification.parentNode.removeChild(notification);
+                            }
+                        }, 500);
+                    }
+                }, SYSTEM_CONFIG.notificationDuration);
+            }
+        }
+
+        // ============================================
+        // FUNCIONES UTILITARIAS
+        // ============================================
+        function getStatusColor(status) {
+            const colors = {
+                active: '#00A86B',
+                prospect: '#FF9E00',
+                negotiation: '#2A4B8C',
+                inactive: '#64748B'
+            };
+            return colors[status] || '#64748B';
+        }
+
+        function getPotentialColor(potential) {
+            const colors = {
+                'muy alto': '#00C9A7',
+                'alto': '#2A4B8C',
+                'medio': '#FF9E00',
+                'bajo': '#64748B',
+                'estrategico': '#9B26B6'
+            };
+            return colors[potential] || '#64748B';
+        }
+
+        function detectNearbyOpportunities() {
+            // Simular detección de oportunidades
+            const newOpportunities = Math.floor(Math.random() * 4) + 8;
+            document.getElementById('statOpportunities').textContent = newOpportunities;
+            
+            // Actualizar clientes en zona
+            const nearbyClients = Math.floor(Math.random() * 3) + 6;
+            document.getElementById('statClients').textContent = nearbyClients;
+        }
+
+        function updateDashboardStats() {
+            // Actualizar en tiempo real
+            detectNearbyOpportunities();
+        }
+
+        function addPointsOfInterest() {
+            // Agregar puntos de interés al mapa
+            PREMIUM_CLIENTS.forEach(client => {
+                L.circleMarker([userLocation.lat + (Math.random() * 0.02 - 0.01), 
+                               userLocation.lng + (Math.random() * 0.02 - 0.01)], {
+                    radius: 8,
+                    fillColor: client.avatarColor,
+                    color: '#fff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).addTo(map).bindPopup(`
+                    <div style="padding: 10px; min-width: 200px;">
+                        <strong>${client.name}</strong><br>
+                        <small>${client.type.toUpperCase()} • ${client.distance}m</small><br>
+                        <span style="color: ${getStatusColor(client.status)}; font-weight: 600;">
+                            ${client.status.toUpperCase()}
+                        </span>
+                    </div>
+                `);
+            });
+        }
+
+        // ============================================
+        // FUNCIONES DE CONTACTO Y REDES
+        // ============================================
+        function openWhatsApp() {
+            const message = "Hola, me interesa conocer más sobre el sistema de geolocalización comercial de Aguas La Colocha.";
+            window.open(`https://wa.me/529618604446?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        function openFacebook() {
+            alert("Facebook: /AguasLaColochaOficial");
+        }
+
+        function openInstagram() {
+            alert("Instagram: @AguasLaColocha_Oficial");
+        }
+
+        function showManual() {
+            alert("📘 Manual de uso disponible en: manual.lacolocha.com");
+        }
+
+        function showTraining() {
+            alert("🎥 Video capacitación: training.lacolocha.com");
+        }
+
+        function downloadReports() {
+            alert("📄 Descargando reportes en formato PDF...");
+        }
+
+        function contactSupport() {
+            alert("🛠️ Soporte técnico: soporte@lacolocha.com | 961 860 4446");
+        }
+
+        // ============================================
+        // INICIALIZAR SISTEMA
+        // ============================================
+        document.addEventListener('DOMContentLoaded', initSystem);
+    </script>
+</body>
+</html>
